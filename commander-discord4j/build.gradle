@@ -1,5 +1,5 @@
-archivesBaseName = "commander-discord"
-description = "A command handling utility for Discord."
+archivesBaseName = "commander-discord4j"
+description = "A command handling utility for Discord using Discord4J."
 
 repositories {
     jcenter()
