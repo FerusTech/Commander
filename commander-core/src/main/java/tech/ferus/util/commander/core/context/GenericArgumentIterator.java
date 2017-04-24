@@ -8,12 +8,12 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
-public class ArgumentIterator implements Iterator<Argument> {
+public class GenericArgumentIterator implements Iterator<Argument> {
 
     private final List<Argument> arguments;
     private int current = -1;
 
-    public ArgumentIterator(@Nonnull final List<Argument> arguments) {
+    public GenericArgumentIterator(@Nonnull final List<Argument> arguments) {
         this.arguments = arguments;
     }
 

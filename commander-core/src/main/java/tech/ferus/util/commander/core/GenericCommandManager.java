@@ -1,6 +1,11 @@
 package tech.ferus.util.commander.core;
 
-import tech.ferus.util.commander.core.context.ContextState;
+import tech.ferus.util.commander.api.Command;
+import tech.ferus.util.commander.api.CommandGroup;
+import tech.ferus.util.commander.api.CommandManager;
+import tech.ferus.util.commander.core.context.GenericArgumentContext;
+import tech.ferus.util.commander.core.context.GenericContextState;
+import tech.ferus.util.commander.core.context.GenericFailures;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -13,7 +18,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class CommandManager {
+public class GenericCommandManager implements CommandManager {
 
     private static final Pattern ARGUMENT_PATTERN = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
 
@@ -21,33 +26,72 @@ public abstract class CommandManager {
     @Nonnull private final Set<CommandGroup> groups;
     @Nonnull private String prefix;
 
-    public CommandManager(@Nonnull final String prefix) {
+    public GenericCommandManager(@Nonnull final String prefix) {
         this.commands = Sets.newHashSet();
         this.groups = Sets.newHashSet();
         this.prefix = prefix;
     }
 
-    public CommandManager() {
+    public GenericCommandManager() {
         this("");
     }
 
-    @Nonnull public Set<Command> getCommands() {
+    @Nonnull
+    @Override
+    public Set<Command> getCommands() {
         return this.commands;
     }
 
-    @Nonnull public Set<CommandGroup> getGroups() {
+    @Nonnull
+    @Override
+    public Set<CommandGroup> getGroups() {
         return this.groups;
     }
 
-    @Nonnull public String getPrefix() {
+    @Nonnull
+    @Override
+    public String getPrefix() {
         return this.prefix;
     }
 
+    @Override
     public void setPrefix(@Nonnull final String prefix) {
         this.prefix = prefix;
     }
 
-    public String[] parseArguments(final String remaining) {
+    @Nonnull
+    @Override
+    public GenericContextState parseInput(@Nonnull final String input) {
+        final String rawInput;
+        if (this.prefix.isEmpty()) {
+            rawInput = input;
+        } else {
+            if (!input.startsWith(this.prefix)) {
+                return new GenericContextState(GenericFailures.NO_PREFIX);
+            } else {
+                rawInput = input.replaceFirst(Pattern.quote(this.prefix), "");
+            }
+        }
+
+        final String[] rawParse = rawInput.split("\\s+");
+        final CommandLookup lookup = this.lookup(rawParse);
+
+        if (lookup.getCommand() == null) {
+            return new GenericContextState(GenericFailures.NO_COMMAND_MATCH);
+        }
+
+        final Command command = lookup.getCommand();
+        final CommandGroup group = lookup.getGroup();
+        final String[] rawArgs = this.parseArguments(String.join(" ", lookup.getRemaining()));
+
+        if (rawArgs.length < command.getExecutor().getRequiredArguments()) {
+            return new GenericContextState(GenericFailures.NOT_ENOUGH_ARGUMENTS);
+        }
+
+        return new GenericContextState(new GenericArgumentContext(rawInput, rawParse, rawArgs, group, command));
+    }
+
+    public String[] parseArguments(@Nonnull final String remaining) {
         final List<String> matches = Lists.newArrayList();
 
         final Matcher m = ARGUMENT_PATTERN.matcher(remaining);
@@ -101,6 +145,4 @@ public abstract class CommandManager {
 
         return CommandLookup.success(group, command, args);
     }
-
-    public abstract ContextState parseInput(@Nonnull final String input);
 }

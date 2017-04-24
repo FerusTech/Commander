@@ -1,5 +1,8 @@
 package tech.ferus.util.commander.core;
 
+import tech.ferus.util.commander.api.Command;
+import tech.ferus.util.commander.api.CommandGroup;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

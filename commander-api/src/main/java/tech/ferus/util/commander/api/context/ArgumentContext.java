@@ -1,10 +1,10 @@
 package tech.ferus.util.commander.api.context;
 
-import tech.ferus.util.commander.core.Command;
-import tech.ferus.util.commander.core.CommandGroup;
-import tech.ferus.util.commander.core.context.Property;
+import tech.ferus.util.commander.api.Command;
+import tech.ferus.util.commander.api.CommandGroup;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -31,5 +31,17 @@ public interface ArgumentContext extends Iterable<Argument> {
 
     @Nonnull Command getCommand();
 
-    @Nonnull public Map<Property<?>, >
+    @Nonnull public Map<Property<?>, Object> getProperties();
+
+    boolean hasProperties();
+
+    boolean hasProperty(@Nonnull final Property property);
+
+    <T> void setProperty(@Nonnull final Property<T> property, final T value);
+
+    @Nullable public <T> T getProperty(@Nonnull final Property<T> property);
+
+    @Nonnull
+    @Override
+    Iterator<Argument> iterator();
 }

@@ -1,9 +1,10 @@
 package tech.ferus.util.commander.core.context;
 
-import tech.ferus.util.commander.core.Command;
-import tech.ferus.util.commander.core.CommandGroup;
+import tech.ferus.util.commander.api.Command;
+import tech.ferus.util.commander.api.CommandGroup;
 import tech.ferus.util.commander.api.context.Argument;
 import tech.ferus.util.commander.api.context.ArgumentContext;
+import tech.ferus.util.commander.api.context.Property;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -20,7 +21,7 @@ public class GenericArgumentContext implements ArgumentContext {
     @Nonnull private final String rawInput;
     @Nonnull private final String[] rawParse;
     @Nonnull private final String[] rawArgs;
-    @Nonnull private final List<GenericArgument> args;
+    @Nonnull private final List<Argument> args;
     @Nullable private final CommandGroup group;
     @Nonnull private final Command command;
     @Nonnull private final Map<Property<?>, Object> properties;
@@ -46,67 +47,90 @@ public class GenericArgumentContext implements ArgumentContext {
         this(rawInput, rawParse, rawArgs, null, command);
     }
 
-    @Nonnull public String getRawInput() {
+    @Nonnull
+    @Override
+    public String getRawInput() {
         return this.rawInput;
     }
 
-    @Nonnull public String[] getRawParse() {
+    @Nonnull
+    @Override
+    public String[] getRawParse() {
         return this.rawParse;
     }
 
-    @Nonnull public String[] getRawArgs() {
+    @Nonnull
+    @Override
+    public String[] getRawArgs() {
         return this.rawArgs;
     }
 
-    @Nonnull public List<GenericArgument> getArgs() {
+    @Nonnull
+    @Override
+    public List<Argument> getArgs() {
         return this.args;
     }
 
-    @Nullable public GenericArgument getFirstForClarification() {
+    @Nullable
+    @Override
+    public Argument getFirstForClarification() {
         return this.args.stream()
                 .filter(argument -> !argument.isClarified())
                 .findFirst().orElse(null);
     }
 
-    public void addArguments(final Collection<GenericArgument> arguments) {
+    @Override
+    public void addArguments(@Nonnull Collection<Argument> arguments) {
         this.args.addAll(arguments);
     }
 
+    @Override
     public boolean isAllClarified() {
         return this.getFirstForClarification() != null;
     }
 
-    @Nullable public CommandGroup getGroup() {
+    @Nullable
+    @Override
+    public CommandGroup getGroup() {
         return this.group;
     }
 
-    @Nonnull public Command getCommand() {
+    @Nonnull
+    @Override
+    public Command getCommand() {
         return this.command;
     }
 
-    @Nonnull public Map<Property<?>, Object> getProperties() {
+    @Nonnull
+    @Override
+    public Map<Property<?>, Object> getProperties() {
         return this.properties;
     }
 
+    @Override
     public boolean hasProperties() {
         return !this.properties.isEmpty();
     }
 
-    public boolean hasProperty(final Property property) {
+    @Override
+    public boolean hasProperty(@Nonnull Property property) {
         return this.properties.containsKey(property);
     }
 
-    public <T> void setProperty(final Property<T> property, final T value) {
+    @Override
+    public <T> void setProperty(@Nonnull Property<T> property, T value) {
         this.properties.put(property, value);
     }
 
-    @Nullable public <T> T getProperty(final Property<T> property) {
+    @Nullable
+    @Override
+    public <T> T getProperty(@Nonnull Property<T> property) {
         return this.hasProperty(property) ? property.getType().cast(this.properties.get(property)) : null;
     }
 
     @Nonnull
     @Override
     public Iterator<Argument> iterator() {
-        return new ArgumentIterator(this.args);
+        return new GenericArgumentIterator(this.args);
     }
 }
