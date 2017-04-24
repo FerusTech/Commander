@@ -1,3 +1,5 @@
 include 'commander-api'
 include 'commander-core'
 include 'commander-discord4j'
+include 'commander-examples'
+

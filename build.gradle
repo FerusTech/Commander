@@ -35,8 +35,9 @@ subprojects {
     apply plugin: "java"
     apply plugin: "idea"
     apply plugin: "maven"
-    apply plugin: "signing"
     apply plugin: "com.github.johnrengelman.shadow"
+
+    if (it.name != "commander-examples") { apply plugin: "signing" }
 
     group "tech.ferus"
     version = "1.0-SNAPSHOT"
@@ -94,50 +95,53 @@ subprojects {
         archives shadowJar
     }
 
-    signing {
-        required { doSigning }
-        sign configurations.archives
-    }
+    if (it.name != "commander-examples") {
+        signing {
+            required { doSigning }
+            sign configurations.archives
+        }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment {
-                    MavenDeployment deployment -> signing.signPm(deployment)
-                }
 
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-                    authentication(userName: uploadUsername, password: uploadPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                    authentication(userName: uploadUsername, password: uploadPassword)
-                }
-
-                pom.project {
-                    name project.name
-                    packaging 'jar'
-                    description project.description
-                    url 'https://github.com/ferustech'
-
-                    scm {
-                        url 'scm:git@github.com:FerusTech/Commander.git'
-                        connection 'scm:git@github.com:FerusTech/Commander.git'
-                        developerConnection 'scm:git@github.com:FerusTech/Commander.git'
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    beforeDeployment {
+                        MavenDeployment deployment -> signing.signPm(deployment)
                     }
 
-                    licenses {
-                        license {
-                            name 'The MIT License'
-                            url 'https://opensource.org/licenses/MIT'
-                            distribution 'repo'
+                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                        authentication(userName: uploadUsername, password: uploadPassword)
+                    }
+
+                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                        authentication(userName: uploadUsername, password: uploadPassword)
+                    }
+
+                    pom.project {
+                        name project.name
+                        packaging 'jar'
+                        description project.description
+                        url 'https://github.com/ferustech'
+
+                        scm {
+                            url 'scm:git@github.com:FerusTech/Commander.git'
+                            connection 'scm:git@github.com:FerusTech/Commander.git'
+                            developerConnection 'scm:git@github.com:FerusTech/Commander.git'
                         }
-                    }
 
-                    developers {
-                        developer {
-                            id 'FerusGrim'
-                            name 'Nicholas Badger'
+                        licenses {
+                            license {
+                                name 'The MIT License'
+                                url 'https://opensource.org/licenses/MIT'
+                                distribution 'repo'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id 'FerusGrim'
+                                name 'Nicholas Badger'
+                            }
                         }
                     }
                 }

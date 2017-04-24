@@ -1,0 +1,10 @@
+repositories {
+    jcenter()
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+dependencies {
+    compile project(":commander-discord4j")
+}
