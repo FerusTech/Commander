@@ -38,7 +38,7 @@ subprojects {
     apply plugin: "signing"
     apply plugin: "com.github.johnrengelman.shadow"
 
-    group "tech.ferus.util"
+    group "tech.ferus"
     version = "1.0-SNAPSHOT"
 
     sourceCompatibility = 1.8
