@@ -1,0 +1,9 @@
+archivesBaseName = "commander-core"
+description = "A generic implementation of commander-api."
+
+dependencies {
+    compile project(":commander-api")
+
+    compile "org.slf4j:slf4j-api:1.7.21"
+    compile "com.google.guava:guava:21.0"
+}

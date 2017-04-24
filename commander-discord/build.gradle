@@ -1,0 +1,16 @@
+archivesBaseName = "commander-discord"
+description = "A command handling utility for Discord."
+
+repositories {
+    jcenter()
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+dependencies {
+    compile project(":commander-core")
+
+    // Discord4J
+    compile "com.github.austinv11:Discord4j:5d26bfa"
+}

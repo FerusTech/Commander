@@ -1,0 +1,169 @@
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
+    }
+}
+
+def gitHash = getGitHash()
+def doSigning = false
+def uploadUsername = System.getenv("SON_USR") ? System.getenv("SON_USR") : "NotReplaced"
+def uploadPassword = System.getenv("SON_PAS") ? System.getenv("SON_PAS") : "NotReplaced"
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Upload }) {
+        doSigning = true
+        uploadUsername = System.getenv("SON_USR") ? System.getenv("SON_USR") : "NotReplaced"
+        uploadPassword = ""
+
+        def location = "$rootDir/secring.gpg"
+        subprojects {
+            project.ext."signing.keyId" = System.getenv("SIGN_ID") ? System.getenv("SIGN_ID") : "NotReplaced"
+            project.ext."signing.secretKeyRingFile" = location
+            project.ext."signing.password" = System.getenv("SIGN_PASS") ? System.getenv("SIGN_PASS") : "NoReplaced"
+        }
+    }
+}
+
+subprojects {
+    apply plugin: "java"
+    apply plugin: "idea"
+    apply plugin: "maven"
+    apply plugin: "signing"
+    apply plugin: "com.github.johnrengelman.shadow"
+
+    group "tech.ferus.util"
+    version = "1.0-SNAPSHOT"
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+    }
+
+    compileJava {
+        options.encoding = 'UTF-8'
+    }
+
+    jar {
+        manifest {
+            attributes(
+                    'Implementation-Title': project.name,
+                    'Implementation-Version': version,
+                    'Build-Version': gitHash
+            )
+        }
+    }
+
+    shadowJar {
+        classifier = "shaded"
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    javadoc {
+        failOnError = false
+        source = sourceSets.main.allJava
+        classpath = configurations.compile
+        options.memberLevel = JavadocMemberLevel.PRIVATE
+    }
+
+    tasks.withType(Jar) {
+        buildDir = file("$rootDir/build")
+    }
+
+    artifacts {
+        archives jar
+        archives sourcesJar
+        archives javadocJar
+        archives shadowJar
+    }
+
+    signing {
+        required { doSigning }
+        sign configurations.archives
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment {
+                    MavenDeployment deployment -> signing.signPm(deployment)
+                }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                    authentication(userName: uploadUsername, password: uploadPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                    authentication(userName: uploadUsername, password: uploadPassword)
+                }
+
+                pom.project {
+                    name project.name
+                    packaging 'jar'
+                    description project.description
+                    url 'https://github.com/ferustech'
+
+                    scm {
+                        url 'scm:git@github.com:FerusTech/Commander.git'
+                        connection 'scm:git@github.com:FerusTech/Commander.git'
+                        developerConnection 'scm:git@github.com:FerusTech/Commander.git'
+                    }
+
+                    licenses {
+                        license {
+                            name 'The MIT License'
+                            url 'https://opensource.org/licenses/MIT'
+                            distribution 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'FerusGrim'
+                            name 'Nicholas Badger'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    build {
+        dependsOn jar
+        dependsOn javadocJar
+        dependsOn sourcesJar
+
+        jar.mustRunAfter clean
+        javadocJar.mustRunAfter jar
+        sourcesJar.mustRunAfter javadocJar
+        shadowJar.mustRunAfter sourcesJar
+    }
+}
+
+private static String getGitHash() {
+    def process = "git rev-parse --short HEAD".execute()
+    process.waitFor()
+    return process.exitValue() ? 'unknown' : process.text.trim()
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "3.2.1"
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
