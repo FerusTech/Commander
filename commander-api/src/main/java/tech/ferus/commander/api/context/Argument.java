@@ -13,6 +13,10 @@ public interface Argument {
 
     @Nonnull List<Possibility<?>> getPossibilities();
 
+    @Nonnull List<?> getPossibleValues();
+
+    @Nonnull <T> List<T> getPossibleValues(@Nonnull final Class<T> type);
+
     <V> void addPossibility(@Nonnull final String key, @Nonnull final V value);
 
     @Nullable Possibility<?> getSelected();
@@ -24,4 +28,5 @@ public interface Argument {
     boolean isClarified();
 
     <T> void resolveAs(@Nonnull final ArgumentResolver<T> resolver);
+
 }

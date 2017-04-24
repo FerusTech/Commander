@@ -7,6 +7,7 @@ import tech.ferus.commander.api.context.Possibility;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,21 @@ public class GenericArgument implements Argument {
         return this.possibilities;
     }
 
+    @Nonnull
+    @Override
+    public List<?> getPossibleValues() {
+        return this.possibilities.stream().map(Possibility::getValue).collect(Collectors.toList());
+    }
+
+    @Nonnull
+    @Override
+    public <T> List<T> getPossibleValues(@Nonnull final Class<T> type) {
+        return this.possibilities.stream()
+                .filter(possibility -> type.isInstance(possibility.getValue()))
+                .map(possibility -> type.cast(possibility.getValue()))
+                .collect(Collectors.toList());
+    }
+
     @Override public <V> void addPossibility(@Nonnull final String key, @Nonnull final V value) {
         this.possibilities.add(new GenericPossibility<>(key, value));
     }
@@ -80,6 +96,6 @@ public class GenericArgument implements Argument {
     }
 
     @Override public <T> void resolveAs(@Nonnull final ArgumentResolver<T> resolver) {
-        this.possibilities.addAll(resolver.resolve());
+        this.possibilities.addAll(resolver.resolve(this));
     }
 }

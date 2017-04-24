@@ -1,5 +1,5 @@
 archivesBaseName = "commander-api"
-description = "A command handling utility."
+description = "A contextual command handler for Java."
 
 dependencies {
     compile "com.google.code.findbugs:jsr305:3.0.2"
