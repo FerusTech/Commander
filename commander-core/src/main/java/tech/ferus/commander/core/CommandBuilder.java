@@ -76,7 +76,10 @@ public class CommandBuilder {
     public static class DefaultExecutor implements CommandExecutor {
 
         @Override
-        public void process(@Nonnull ArgumentContext context) {}
+        public void process(@Nonnull final ArgumentContext context) {}
+
+        @Override
+        public void execute(@Nonnull final ArgumentContext context) {}
 
         @Override
         public int getRequiredArguments() {

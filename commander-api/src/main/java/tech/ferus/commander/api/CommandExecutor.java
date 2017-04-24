@@ -8,5 +8,7 @@ public interface CommandExecutor {
 
     void process(@Nonnull final ArgumentContext context);
 
+    void execute(@Nonnull final ArgumentContext context);
+
     int getRequiredArguments();
 }

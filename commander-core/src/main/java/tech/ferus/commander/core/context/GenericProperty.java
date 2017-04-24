@@ -8,7 +8,7 @@ public class GenericProperty<T> implements Property<T> {
 
     @Nonnull private final Class<T> type;
 
-    private GenericProperty(@Nonnull final Class<T> type) {
+    public GenericProperty(@Nonnull final Class<T> type) {
         this.type = type;
     }
 

@@ -10,7 +10,11 @@ public interface CommandManager {
 
     @Nonnull Collection<Command> getCommands();
 
+    void addCommand(@Nonnull final Command command);
+
     @Nonnull Collection<CommandGroup> getGroups();
+
+    void addGroup(@Nonnull final CommandGroup group);
 
     @Nonnull String getPrefix();
 

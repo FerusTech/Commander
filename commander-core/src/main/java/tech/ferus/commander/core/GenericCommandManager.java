@@ -42,10 +42,20 @@ public class GenericCommandManager implements CommandManager {
         return this.commands;
     }
 
+    @Override
+    public void addCommand(@Nonnull final Command command) {
+        this.commands.add(command);
+    }
+
     @Nonnull
     @Override
     public Set<CommandGroup> getGroups() {
         return this.groups;
+    }
+
+    @Override
+    public void addGroup(@Nonnull final CommandGroup group) {
+        this.groups.add(group);
     }
 
     @Nonnull
