@@ -27,10 +27,10 @@ public class DiscordCommandManager extends GenericCommandManager {
         final GenericContextState state = this.parseInput(message.getContent());
 
         if (state.getContext() != null) {
-            state.getContext().setProperty(GUILD, message.getGuild().getLongID());
-            state.getContext().setProperty(CHANNEL, message.getChannel().getLongID());
-            state.getContext().setProperty(MESSAGE, message.getLongID());
-            state.getContext().setProperty(USER, message.getAuthor().getLongID());
+            state.getContext().setProperty(GUILD, message.getGuild());
+            state.getContext().setProperty(CHANNEL, message.getChannel());
+            state.getContext().setProperty(MESSAGE, message);
+            state.getContext().setProperty(USER, message.getAuthor());
         }
 
         return state;
