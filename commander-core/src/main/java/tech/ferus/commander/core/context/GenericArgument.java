@@ -56,7 +56,6 @@ public class GenericArgument implements Argument {
             values.add(possibility.getValue());
         }
         return values;
-        //return this.possibilities.stream().map(Possibility::getValue).collect(Collectors.toList());
     }
 
     @Nonnull
