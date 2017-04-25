@@ -51,7 +51,11 @@ public class GenericArgument implements Argument {
     @Nonnull
     @Override
     public List<?> getPossibleValues() {
-        return Lists.newArrayList();
+        final List<Object> values = Lists.newArrayList();
+        for (final Possibility<?> possibility : this.possibilities) {
+            values.add(possibility.getValue());
+        }
+        return values;
         //return this.possibilities.stream().map(Possibility::getValue).collect(Collectors.toList());
     }
 
